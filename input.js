@@ -3,7 +3,7 @@ exports.askLogin = () => {
   const questions = [{
     name: 'token',
     type: 'password',
-    message: 'Enter your auth-token from twitch.tv 🔑:',
+    message: 'Enter your auth-token from twitch.tv:',
     validate: function(value) {
       if (value.length) {
         return true;

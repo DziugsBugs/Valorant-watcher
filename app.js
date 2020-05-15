@@ -20,7 +20,7 @@ const streamersUrl = (process.env.streamersUrl || 'https://www.twitch.tv/directo
 const scrollDelay = (Number(process.env.scrollDelay) || 2000);
 const scrollTimes = (Number(process.env.scrollTimes) || 5);
 
-const minWatching = (Number(process.env.minWatching) || 15); // Minutes
+const minWatching = (Number(process.env.minWatching) || 20); // Minutes
 const maxWatching = (Number(process.env.maxWatching) || 30); //Minutes
 
 const streamerListRefresh = (Number(process.env.streamerListRefresh) || 1);
@@ -92,7 +92,7 @@ async function viewRandomPage(browser, page) {
       await clickWhenExist(page, matureContentQuery); //Click on accept button
 
       if (firstRun) {
-        console.log('🔧 Setting lowest possible resolution..');
+        console.log('Setting lowest possible resolution..');
         await clickWhenExist(page, streamPauseQuery);
 
         await clickWhenExist(page, streamSettingsQuery);
@@ -124,7 +124,7 @@ async function viewRandomPage(browser, page) {
         await page.screenshot({
           path: `${screenshotFolder}${watch}.png`
         });
-        console.log('📸 Screenshot created: ' + `${watch}.png`);
+        console.log('Screenshot created: ' + `${watch}.png`);
       }
 
       await clickWhenExist(page, sidebarQuery); //Open sidebar
@@ -132,13 +132,13 @@ async function viewRandomPage(browser, page) {
       let status = await queryOnWebsite(page, userStatusQuery); //status jQuery
       await clickWhenExist(page, sidebarQuery); //Close sidebar
 
-      console.log('💡 Account status:', status[0] ? status[0].children[0].data : "Unknown");
-      console.log('🕒 Time: ' + dayjs().format('HH:mm:ss'));
-      console.log('💤 Watching stream for ' + sleep / 60000 + ' minutes\n');
+      console.log('Account status:', status[0] ? status[0].children[0].data : "Unknown");
+      console.log('Time: ' + dayjs().format('HH:mm:ss'));
+      console.log('Watching stream for ' + sleep / 60000 + ' minutes\n');
 
       await page.waitFor(sleep);
     } catch (e) {
-      console.log('🤬 Error: ', e);
+      console.log('Error: ', e);
       console.log('Please visit the discord channel to receive help: https://discord.gg/s8AH4aZ');
     }
   }
@@ -160,10 +160,10 @@ async function readLoginData() {
     "id": 1
   }];
   try {
-    console.log('🔎 Checking config file...');
+    console.log('Checking config file...');
 
     if (fs.existsSync(configPath)) {
-      console.log('✅ Json config found!');
+      console.log('Json config found!');
 
       let configFile = JSON.parse(fs.readFileSync(configPath, 'utf8'))
 
@@ -173,7 +173,7 @@ async function readLoginData() {
 
       return cookie;
     } else if (process.env.token) {
-      console.log('✅ Env config found');
+      console.log('Env config found');
 
       if (proxy) browserConfig.args.push('--proxy-server=' + proxy);
       cookie[0].value = process.env.token; //Set cookie from env
@@ -181,7 +181,7 @@ async function readLoginData() {
 
       return cookie;
     } else {
-      console.log('❌ No config file found!');
+      console.log('No config file found!');
 
       let input = await inquirer.askLogin();
 
@@ -198,7 +198,7 @@ async function readLoginData() {
       return cookie;
     }
   } catch (err) {
-    console.log('🤬 Error: ', e);
+    console.log('Error: ', e);
     console.log('Please visit my discord channel to solve this problem: https://discord.gg/s8AH4aZ');
   }
 }
@@ -211,13 +211,13 @@ async function spawnBrowser() {
   var browser = await puppeteer.launch(browserConfig);
   var page = await browser.newPage();
 
-  console.log('🔧 Setting User-Agent...');
+  console.log('Setting User-Agent...');
   await page.setUserAgent(userAgent); //Set userAgent
 
-  console.log('🔧 Setting auth token...');
+  console.log('Setting auth token...');
   await page.setCookie(...cookie); //Set cookie
 
-  console.log('⏰ Setting timeouts...');
+  console.log('Setting timeouts...');
   await page.setDefaultNavigationTimeout(process.env.timeout || 0);
   await page.setDefaultTimeout(process.env.timeout || 0);
 
@@ -240,15 +240,15 @@ async function getAllStreamer(page) {
   await page.goto(streamersUrl, {
     "waitUntil": "networkidle0"
   });
-  console.log('🔐 Checking login...');
+  console.log('Checking login...');
   await checkLogin(page);
-  console.log('📡 Checking active streamers...');
+  console.log('Checking active streamers...');
   await scroll(page, scrollTimes);
   const jquery = await queryOnWebsite(page, channelsQuery);
   streamers = null;
   streamers = new Array();
 
-  console.log('🧹 Filtering out html codes...');
+  console.log('Filtering out html codes...');
   for (var i = 0; i < jquery.length; i++) {
     streamers[i] = jquery[i].attribs.href.split("/")[1];
   }
@@ -261,13 +261,13 @@ async function checkLogin(page) {
   let cookieSetByServer = await page.cookies();
   for (var i = 0; i < cookieSetByServer.length; i++) {
     if (cookieSetByServer[i].name == 'twilight-user') {
-      console.log('✅ Login successful!');
+      console.log('Login successful!');
       return true;
     }
   }
-  console.log('🛑 Login failed!');
-  console.log('🔑 Invalid token!');
-  console.log('\nPleas ensure that you have a valid twitch auth-token.\nhttps://github.com/D3vl0per/Valorant-watcher#how-token-does-it-look-like');
+  console.log('Login failed!');
+  console.log('Invalid token!');
+  console.log('\nPlease ensure that you have a valid twitch auth-token.\nhttps://github.com/D3vl0per/Valorant-watcher#how-token-does-it-look-like');
   if (!process.env.token) {
     fs.unlinkSync(configPath);
   }
@@ -277,7 +277,7 @@ async function checkLogin(page) {
 
 
 async function scroll(page, times) {
-  console.log('🔨 Emulating scrolling...');
+  console.log('Emulating scrolling...');
 
   for (var i = 0; i < times; i++) {
     await page.evaluate(async (page) => {
@@ -342,7 +342,7 @@ async function killBrowser(browser, page) {
 
 
 async function shutDown() {
-  console.log("\n👋Bye Bye👋");
+  console.log("\nBye Bye");
   run = false;
   process.exit();
 }
@@ -359,7 +359,7 @@ async function main() {
   } = await spawnBrowser();
   await getAllStreamer(page);
   console.log("=========================");
-  console.log('🔭 Running watcher...');
+  console.log('Running watcher...');
   await viewRandomPage(browser, page);
 };
 
